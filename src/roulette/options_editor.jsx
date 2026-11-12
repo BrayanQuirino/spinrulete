@@ -2,7 +2,7 @@ import React, { useState as use_state } from 'react';
 import { parse_option_lines } from './option_lines.js';
 import { max_label_length, max_options, palette } from './wheel_math.js';
 
-export function OptionsEditor({ options, is_spinning, on_import, on_remove }) {
+export function OptionsEditor({ options, is_spinning, on_import, on_remove, show_numbers }) {
   const [draft, set_draft] = use_state('');
   const [feedback, set_feedback] = use_state('');
   const pending = parse_option_lines(draft);
@@ -67,7 +67,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove }) {
           {options.map((label, index) => (
             <li key={index} className="option_row">
               <span className="option_dot" style={{ background: palette[index % palette.length].fill }} />
-              <span className="option_label">{label}</span>
+              <span className="option_label">{show_numbers && <span className="option_number">{index + 1}. </span>}{label}</span>
               <button
                 className="remove_button"
                 type="button"

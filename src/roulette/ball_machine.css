@@ -1,0 +1,115 @@
+.ball_machine {
+  --ball_size: clamp(34px, 9.5%, 56px);
+  width: min(100%, 555px);
+  margin-block: 12px 0;
+}
+.ball_machine.compact { --ball_size: clamp(24px, 8%, 44px); }
+.ball_machine.dense { --ball_size: clamp(19px, 6.8%, 38px); }
+.ball_glass {
+  position: relative;
+  aspect-ratio: 1.4;
+  isolation: isolate;
+  overflow: hidden;
+  border: clamp(4px, 1vw, 8px) solid #435158;
+  border-radius: 47% 47% 24% 24% / 47% 47% 29% 29%;
+  background: radial-gradient(ellipse at 50% 24%, #324449, #1b2a30 60%, #152025);
+  box-shadow: inset 0 0 0 2px #a8ecd826, inset 0 -18px 30px #0c1217, 0 16px 36px #0005;
+}
+.ball_glass::before {
+  position: absolute;
+  inset: 8% 10% auto;
+  height: 41%;
+  border-top: 2px solid #bfece260;
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+.ball_rack { position: absolute; inset: 7% 8% 2%; }
+.draw_ball {
+  display: grid;
+  place-items: center;
+  width: var(--ball_size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 24%, #ffffffa1 0%, transparent 48%), var(--ball_fill);
+  color: var(--ball_ink);
+  box-shadow: inset -4px -7px 12px #0004, 0 4px 8px #0006;
+  font-size: clamp(.7rem, 2.4vw, 1rem);
+  font-weight: 770;
+  font-variant-numeric: tabular-nums;
+}
+.rack_ball {
+  position: absolute;
+  left: var(--ball_x);
+  top: var(--ball_y);
+  transform: translate(-50%, -50%);
+}
+.rack_ball.selected_ball { visibility: hidden; }
+.is_mixing .rack_ball {
+  animation: mix_ball var(--mix_time) linear both;
+}
+.is_mixing .rack_ball.selected_ball {
+  visibility: visible;
+  animation: mix_ball var(--mix_time) linear both, release_ball var(--drop_time) var(--mix_time) steps(1, start) forwards;
+}
+@keyframes mix_ball {
+  0% { left: var(--ball_x); top: var(--ball_y); rotate: 0deg; }
+  100% { left: var(--ball_x); top: var(--ball_y); rotate: 720deg; }
+  15% { left: var(--bounce_x); top: var(--bounce_y); rotate: 100deg; }
+  31% { left: var(--cross_x); top: 78%; rotate: 190deg; }
+  48% { left: var(--ball_x); top: var(--cross_y); rotate: 340deg; }
+  67% { left: var(--cross_x); top: 18%; rotate: 500deg; }
+  83% { left: var(--bounce_x); top: 70%; rotate: 680deg; }
+}
+@keyframes release_ball {
+  from, to { visibility: hidden; }
+}
+.ball_base {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 62%;
+  margin: -3px auto 0;
+  padding-top: 24px;
+  border: 1px solid #46575d;
+  border-radius: 0 0 16px 16px;
+  background: linear-gradient(#293b40, #202a2f);
+}
+.ball_chute {
+  position: absolute;
+  top: 0;
+  width: 32%;
+  height: 25px;
+  border-radius: 0 0 7px 7px;
+  background: #111a1f;
+  box-shadow: inset 0 -2px 0 #829c9e60;
+}
+.ball_tray {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 65%;
+  height: clamp(47px, 11vw, 73px);
+  margin-bottom: 8px;
+  border: 1px solid #53666d;
+  border-radius: 12px;
+  background: #0e181b;
+}
+.prize_ball {
+  --ball_size: clamp(32px, 9vw, 55px);
+  position: absolute;
+  z-index: 1;
+}
+.is_mixing .prize_ball {
+  animation: prize_drop var(--drop_time) var(--mix_time) cubic-bezier(.3,.08,.35,1) both;
+}
+@keyframes prize_drop {
+  0% { opacity: 0; transform: translateY(-125%) scale(.8); }
+  14% { opacity: 1; }
+  64% { transform: translateY(14%) scale(1.05,.94) rotate(130deg); }
+  80% { transform: translateY(-16%) rotate(150deg); }
+  100% { opacity: 1; transform: translateY(0) rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is_mixing .draw_ball { animation: none; }
+}

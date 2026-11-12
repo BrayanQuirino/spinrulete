@@ -132,26 +132,67 @@ button:disabled { cursor: default; opacity: .52; }
 .sound_button span { margin-right: 4px; color: var(--accent); }
 .sound_button[aria-pressed="false"] span { color: var(--muted); }
 
+.draw_modes {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 25px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--field);
+}
+.draw_modes button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 650;
+}
+.draw_modes button[aria-pressed="true"] { background: #2e3c3d; color: #d7fff1; }
+.draw_modes button:disabled { opacity: .72; }
 .result {
   width: min(100%, 560px);
-  margin-top: 16px;
   text-align: center;
   color: var(--muted);
   overflow-wrap: anywhere;
 }
-.result:empty { margin: 0; }
-.winner_card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px 15px;
-  border: 1px solid #a8ecd8;
-  border-radius: 12px;
-  color: var(--accent_ink);
-  background: var(--accent);
+.draw_status, .winner_card { margin-top: 16px; }
+.draw_status { display: block; }
+.screen_reader_status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
-.winner_card > span { color: #225c4c; }
+.winner_card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 12px 16px 15px;
+  border: 1px solid #ffffff50;
+  border-radius: 12px;
+  text-align: left;
+}
+.winner_text { flex: 1 1 150px; min-width: 0; }
+.winner_remove {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 6px 11px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: .83rem;
+  font-weight: 650;
+}
+.winner_remove:hover { background: #0002; }
+.winner_remove:focus-visible { outline-color: currentColor; }
 .winner_label { display: block; font-size: .8rem; font-weight: 650; }
 .winner_card strong { display: block; margin-top: 3px; font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.06; letter-spacing: -.045em; }
 @media (prefers-reduced-motion: no-preference) {
@@ -210,6 +251,7 @@ button:disabled { cursor: default; opacity: .52; }
   border-top: 1px solid var(--line);
 }
 .option_dot { width: 9px; aspect-ratio: 1; border-radius: 50%; }
+.option_number { color: var(--muted); font-variant-numeric: tabular-nums; }
 .option_label { overflow-wrap: anywhere; font-size: .9rem; }
 .remove_button {
   width: 44px;
