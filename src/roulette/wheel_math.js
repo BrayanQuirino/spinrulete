@@ -5,12 +5,12 @@ export const spin_duration = 3900;
 export const spin_easing = [0.12, 0.74, 0.11, 1];
 
 export const palette = [
-  { fill: '#ffca50', ink: '#331d06' },
-  { fill: '#f76e85', ink: '#3c1022' },
-  { fill: '#7842d6', ink: '#ffffff' },
-  { fill: '#58dfc5', ink: '#0c3532' },
-  { fill: '#4d62dc', ink: '#ffffff' },
-  { fill: '#ffa16b', ink: '#3e1c13' },
+  { fill: '#f3ca78', ink: '#201809' },
+  { fill: '#f39781', ink: '#2a1511' },
+  { fill: '#b4a4ed', ink: '#191629' },
+  { fill: '#9be5d0', ink: '#10241f' },
+  { fill: '#86b4f0', ink: '#191629' },
+  { fill: '#e7a2c4', ink: '#2e1823' },
 ];
 
 export function normalize_angle(angle) {

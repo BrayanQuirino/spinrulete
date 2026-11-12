@@ -1,7 +1,7 @@
 import React, { useEffect as use_effect, useRef as use_ref } from 'react';
 import { palette, spin_easing } from './wheel_math.js';
 
-const canvas_size = 900;
+const canvas_size = 1200;
 const radius = canvas_size / 2;
 const circle = 2 * Math.PI;
 
@@ -35,17 +35,22 @@ function draw_wheel(canvas, options) {
     context.closePath();
     context.fillStyle = fill;
     context.fill();
-    context.lineWidth = 4;
-    context.strokeStyle = '#21113b35';
+    context.lineWidth = 3;
+    context.strokeStyle = '#14191e40';
     context.stroke();
 
     context.save();
-    context.rotate(start + sector / 2);
-    context.font = `700 ${Math.min(38, Math.max(18, 590 / options.length))}px system-ui, sans-serif`;
+    const label_angle = start + sector / 2;
+    const flip_label = Math.cos(label_angle) < 0;
+    // Keep the labels on the left half readable in the resting orientation.
+    context.rotate(label_angle);
+    context.translate(radius - 49, 0);
+    if (flip_label) context.rotate(Math.PI);
+    context.font = `700 ${Math.min(49, Math.max(24, 820 / options.length))}px system-ui, sans-serif`;
     context.fillStyle = ink;
     context.textBaseline = 'middle';
-    context.textAlign = 'right';
-    context.fillText(fit_label(context, label, 265), radius - 38, 0);
+    context.textAlign = flip_label ? 'left' : 'right';
+    context.fillText(fit_label(context, label, 355), 0, 0);
     context.restore();
   });
 

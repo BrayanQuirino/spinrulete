@@ -84,13 +84,7 @@ export function Roulette() {
 
   return (
     <div className="workspace">
-      <section className="card wheel_card" aria-label="Ruleta">
-        <div className="wheel_toolbar">
-          <a href="#opciones">Editar opciones</a>
-          <button className="sound_button" type="button" aria-label="Sonido" aria-pressed={sound_enabled} onClick={toggle_sound}>
-            <span aria-hidden="true">{sound_enabled ? '♪' : '♩'}</span> {sound_enabled ? 'Sonido activo' : 'Sonido silenciado'}
-          </button>
-        </div>
+      <section className="wheel_stage" aria-label="Ruleta">
         <Wheel options={options} rotation={rotation} duration={duration} can_spin={can_spin} on_spin={spin_wheel} />
         <div className="result" role="status" aria-atomic="true">
           {winner && (
@@ -102,9 +96,14 @@ export function Roulette() {
           )}
           {!winner && options.length < 2 && 'Agrega al menos dos opciones para girar.'}
         </div>
-        <button className="spin_button" type="button" onClick={spin_wheel} disabled={!can_spin}>
-          <span aria-hidden="true">↻</span> {is_spinning ? 'Girando…' : 'Girar ruleta'}
-        </button>
+        <div className="wheel_controls">
+          <button className="spin_button" type="button" onClick={spin_wheel} disabled={!can_spin}>
+            <span aria-hidden="true">↻</span> {is_spinning ? 'Girando…' : 'Girar ruleta'}
+          </button>
+          <button className="sound_button" type="button" aria-label="Sonido" aria-pressed={sound_enabled} onClick={toggle_sound}>
+            <span aria-hidden="true">♪</span> {sound_enabled ? 'Sonido activo' : 'Silenciado'}
+          </button>
+        </div>
       </section>
       <OptionsEditor options={options} is_spinning={is_spinning} on_import={import_options} on_remove={remove_option} />
     </div>
