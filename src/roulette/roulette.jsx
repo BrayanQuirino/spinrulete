@@ -1,5 +1,6 @@
 import React, { useEffect as use_effect, useRef as use_ref, useState as use_state } from 'react';
 import { BallMachine, ball_draw_duration, ball_mix_duration } from './ball_machine.jsx';
+import { CapybaraRace, max_racers, race_duration } from './capybara_race.jsx';
 import { OptionsEditor } from './options_editor.jsx';
 import { create_roulette_audio, get_tick_times } from './roulette_audio.js';
 import { append_options, load_options, save_options } from './storage.js';
@@ -12,16 +13,18 @@ export function Roulette() {
   const [duration, set_duration] = use_state(0);
   const [is_spinning, set_is_spinning] = use_state(false);
   const [winner_index, set_winner_index] = use_state(null);
-  const [pending_ball, set_pending_ball] = use_state(null);
+  const [pending_draw, set_pending_draw] = use_state(null);
   const [mode, set_mode] = use_state('wheel');
   const [sound_enabled, set_sound_enabled] = use_state(true);
   const audio_ref = use_ref(null);
   const timer_ref = use_ref(null);
   const draw_balls = mode === 'balls';
+  const race = mode === 'race';
+  const draw_wheel = mode === 'wheel';
   const selected_option = options[winner_index];
   const winner = selected_option?.label;
   const winner_color = palette[selected_option?.color_index];
-  const can_spin = options.length >= 2 && !is_spinning;
+  const can_spin = options.length >= 2 && (!race || options.length <= max_racers) && !is_spinning;
 
   use_effect(() => save_options(options), [options]);
   use_effect(() => () => {
@@ -70,11 +73,11 @@ export function Roulette() {
 
     const selected_index = Math.floor(Math.random() * options.length);
     const reduce_motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const animation_duration = reduce_motion ? 0 : draw_balls ? ball_draw_duration : spin_duration;
-    const next_rotation = draw_balls ? rotation : get_spin_rotation(rotation, options.length, selected_index);
+    const animation_duration = reduce_motion ? 0 : race ? race_duration : draw_balls ? ball_draw_duration : spin_duration;
+    const next_rotation = draw_wheel ? get_spin_rotation(rotation, options.length, selected_index) : rotation;
     set_winner_index(null);
 
-    if (!draw_balls) {
+    if (draw_wheel) {
       set_duration(animation_duration);
       set_rotation(next_rotation);
     }
@@ -82,7 +85,7 @@ export function Roulette() {
     if (sound_enabled) {
       audio_ref.current ??= create_roulette_audio();
       audio_ref.current?.unlock();
-      if (audio_ref.current && animation_duration) {
+      if (audio_ref.current && animation_duration && !race) {
         const times = draw_balls
           ? [0, 90, 230, 410, 570, 720, 910, 1110, 1260, 1480, 1740, 2030, ball_mix_duration + 540]
           : get_tick_times(rotation, next_rotation, options.length, animation_duration);
@@ -92,7 +95,7 @@ export function Roulette() {
 
     function finish_draw() {
       set_winner_index(selected_index);
-      set_pending_ball(null);
+      set_pending_draw(null);
       set_is_spinning(false);
       audio_ref.current?.play_win();
     }
@@ -102,21 +105,22 @@ export function Roulette() {
       return;
     }
 
-    if (draw_balls) set_pending_ball(selected_index);
+    if (!draw_wheel) set_pending_draw(selected_index);
     set_is_spinning(true);
     timer_ref.current = window.setTimeout(finish_draw, animation_duration);
   }
 
   return (
     <div className="workspace">
-      <section className="wheel_stage" aria-label={draw_balls ? 'Sorteo de bolas' : 'Ruleta'}>
+      <section className="wheel_stage" aria-label={race ? 'Carrera de capibaras' : draw_balls ? 'Sorteo de bolas' : 'Ruleta'}>
         <div className="draw_modes" role="group" aria-label="Tipo de sorteo">
-          <button type="button" aria-pressed={!draw_balls} disabled={is_spinning} onClick={() => change_mode('wheel')}>Ruleta</button>
+          <button type="button" aria-pressed={draw_wheel} disabled={is_spinning} onClick={() => change_mode('wheel')}>Ruleta</button>
           <button type="button" aria-pressed={draw_balls} disabled={is_spinning} onClick={() => change_mode('balls')}>Sorteo de bolas</button>
+          <button type="button" aria-pressed={race} disabled={is_spinning} onClick={() => change_mode('race')}>Capibaras</button>
         </div>
-        {draw_balls
-          ? <BallMachine options={options} pending_index={pending_ball} winner_index={winner_index} />
-          : <Wheel options={options} rotation={rotation} duration={duration} can_spin={can_spin} on_spin={run_draw} />}
+        {draw_wheel && <Wheel options={options} rotation={rotation} duration={duration} can_spin={can_spin} on_spin={run_draw} />}
+        {draw_balls && <BallMachine options={options} pending_index={pending_draw} winner_index={winner_index} />}
+        {race && <CapybaraRace options={options} pending_index={pending_draw} winner_index={winner_index} />}
         <div className="result">
           <span className="screen_reader_status" role="status" aria-atomic="true">
             {winner ? `Resultado: ${winner}${draw_balls ? `, bola ${winner_index + 1}` : ''}` : ''}
@@ -139,8 +143,8 @@ export function Roulette() {
         </div>
         <div className="wheel_controls">
           <button className="spin_button" type="button" onClick={run_draw} disabled={!can_spin}>
-            <span aria-hidden="true">{draw_balls ? '●' : '↻'}</span>{' '}
-            {draw_balls ? (is_spinning ? 'Mezclando…' : 'Sacar una bola') : (is_spinning ? 'Girando…' : 'Girar ruleta')}
+            <span aria-hidden="true">{race ? '⚑' : draw_balls ? '●' : '↻'}</span>{' '}
+            {race ? (is_spinning ? 'En carrera…' : 'Iniciar carrera') : draw_balls ? (is_spinning ? 'Mezclando…' : 'Sacar una bola') : (is_spinning ? 'Girando…' : 'Girar ruleta')}
           </button>
           <button className="sound_button" type="button" aria-label="Sonido" aria-pressed={sound_enabled} onClick={toggle_sound}>
             <span aria-hidden="true">♪</span> {sound_enabled ? 'Sonido activo' : 'Silenciado'}

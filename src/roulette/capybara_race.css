@@ -1,0 +1,112 @@
+.race_track {
+  width: min(100%, 700px);
+  padding: 10px;
+  margin: 0;
+  list-style: none;
+  border: 1px solid #60836d;
+  border-radius: 18px;
+  background: #233e31;
+}
+.race_lane {
+  display: grid;
+  grid-template-columns: minmax(0, 24%) minmax(0, 1fr);
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px dashed #b5df9c68;
+  background: #325942;
+}
+.race_lane:nth-child(even) { background: #2d503c; }
+.race_lane:last-child { border-bottom: 0; }
+.race_lane.winning_lane { background: #476743; }
+.race_name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 6px;
+  color: #f2f6dd;
+  font-size: clamp(.69rem, 1.9vw, .87rem);
+  font-weight: 650;
+}
+.race_name_text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.race_dot { width: 7px; aspect-ratio: 1; flex: none; border-radius: 50%; }
+.race_course {
+  --runner_width: clamp(31px, 7vw, 45px);
+  position: relative;
+  display: block;
+  height: 38px;
+}
+.race_finish {
+  position: absolute;
+  inset: 0 2px 0 auto;
+  width: 12px;
+  background: conic-gradient(#eef5d9 25%, #203a2a 0 50%, #eef5d9 0 75%, #203a2a 0) 0 0 / 12px 12px;
+  opacity: .85;
+}
+.capy_runner {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  width: var(--runner_width);
+  aspect-ratio: 1.6;
+}
+.capy_shadow { position: absolute; inset: 79% 5% 0; border-radius: 50%; background: #13271e80; }
+.capy_animal { position: absolute; inset: 0; }
+.capy_body {
+  position: absolute;
+  inset: 24% 25% 18% 2%;
+  border-radius: 49% 48% 33% 34%;
+  background: linear-gradient(#dba06e, #a96646);
+}
+.capy_head {
+  position: absolute;
+  inset: 18% 0 23% 53%;
+  border-radius: 36% 47% 31% 32%;
+  background:
+    radial-gradient(circle at 49% 39%, #241b16 0 9%, transparent 11%),
+    radial-gradient(circle at 69% 54%, #ebaa91 0 12%, transparent 14%),
+    linear-gradient(105deg, #d69a70 65%, #ac7359 65%);
+}
+.capy_head::before {
+  content: '';
+  position: absolute;
+  inset: -21% 65% 69% 8%;
+  border: 2px solid #bd845f;
+  border-radius: 50%;
+  background: #875443;
+}
+.capy_bib {
+  position: absolute;
+  inset: 34% 49% 25% 24%;
+  border-radius: 4px;
+  background: var(--bib);
+}
+.capy_foot {
+  position: absolute;
+  bottom: 7%;
+  width: 13%;
+  height: 34%;
+  border-radius: 4px;
+  background: #784e3c;
+  transform-origin: top;
+}
+.back_foot { left: 15%; }
+.front_foot { left: 61%; }
+.racing .capy_runner { animation: race_run var(--race_time) linear both; }
+.racing .capy_animal { animation: race_hop var(--stride_time) ease-in-out infinite alternate; }
+.racing .capy_foot { animation: race_stride var(--stride_time) ease-in-out infinite alternate; }
+.racing .front_foot { animation-direction: alternate-reverse; }
+.finished .capy_runner { left: calc((100% - var(--runner_width)) * var(--finish)); }
+@keyframes race_run {
+  0% { left: 0; }
+  24% { left: calc((100% - var(--runner_width)) * var(--early)); }
+  53% { left: calc((100% - var(--runner_width)) * var(--middle)); }
+  82% { left: calc((100% - var(--runner_width)) * var(--late)); }
+  100% { left: calc((100% - var(--runner_width)) * var(--finish)); }
+}
+@keyframes race_hop { to { transform: translateY(-4px) rotate(-5deg); } }
+@keyframes race_stride { from { transform: rotate(-30deg); } to { transform: rotate(30deg); } }
+.race_notice { margin: 0; color: var(--muted); text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  .racing .capy_runner, .racing .capy_animal, .racing .capy_foot { animation: none; }
+}
