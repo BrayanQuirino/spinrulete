@@ -1,5 +1,5 @@
 import React, { useEffect as use_effect, useRef as use_ref } from 'react';
-import { palette } from './wheel_math.js';
+import { palette, spin_easing } from './wheel_math.js';
 
 const canvas_size = 900;
 const radius = canvas_size / 2;
@@ -35,6 +35,9 @@ function draw_wheel(canvas, options) {
     context.closePath();
     context.fillStyle = fill;
     context.fill();
+    context.lineWidth = 4;
+    context.strokeStyle = '#21113b35';
+    context.stroke();
 
     context.save();
     context.rotate(start + sector / 2);
@@ -49,7 +52,7 @@ function draw_wheel(canvas, options) {
   context.restore();
 }
 
-export function Wheel({ options, rotation, duration }) {
+export function Wheel({ options, rotation, duration, can_spin, on_spin }) {
   const canvas_ref = use_ref(null);
 
   use_effect(() => {
@@ -57,16 +60,17 @@ export function Wheel({ options, rotation, duration }) {
   }, [options]);
 
   return (
-    <div className="wheel" aria-hidden="true">
+    <button className="wheel" type="button" aria-label="Girar tocando la rueda" disabled={!can_spin} onClick={on_spin}>
       {options.length > 0 && <span className="wheel_pointer" />}
       <canvas
         className="wheel_canvas"
+        aria-hidden="true"
         ref={canvas_ref}
         width={canvas_size}
         height={canvas_size}
-        style={{ transform: `rotate(${rotation}deg)`, transitionDuration: `${duration}ms` }}
+        style={{ transform: `rotate(${rotation}deg)`, transitionDuration: `${duration}ms`, transitionTimingFunction: `cubic-bezier(${spin_easing.join(',')})` }}
       />
-      <span className="wheel_hub">✦</span>
-    </div>
+      <span className="wheel_hub" aria-hidden="true">▶</span>
+    </button>
   );
 }

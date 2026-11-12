@@ -1,6 +1,6 @@
 # SpinRulete
 
-Ruleta aleatoria en español, hecha con React y JavaScript. Agrega o elimina opciones y gira la rueda. Cada entrada ocupa un sector y tiene la misma probabilidad. Las opciones se guardan en el navegador.
+Ruleta aleatoria en español, hecha con React y JavaScript. Pega una opción por línea para agregar o reemplazar la lista. Toca la rueda o usa el botón para girar. El sonido se puede silenciar desde la ruleta. Cada entrada ocupa un sector y tiene la misma probabilidad. Las opciones se guardan en el navegador.
 
 ## Desarrollo local
 
@@ -18,7 +18,9 @@ npm run preview
 | Ruta | Responsabilidad |
 | --- | --- |
 | `src/roulette/roulette.jsx` | Estado de la lista, coordinación del giro y anuncio del resultado |
-| `src/roulette/options_editor.jsx` | Formulario y lista editable |
+| `src/roulette/options_editor.jsx` | Importación por líneas y lista editable |
+| `src/roulette/option_lines.js` | Lectura de líneas pegadas desde distintas plataformas |
+| `src/roulette/roulette_audio.js` | Clics al cruzar sectores y sonido de resultado con Web Audio |
 | `src/roulette/wheel.jsx` | Dibujo de sectores y etiquetas en Canvas |
 | `src/roulette/wheel_math.js` | Ángulos, colores y límites del editor |
 | `src/roulette/storage.js` | Persistencia local y recuperación de datos |

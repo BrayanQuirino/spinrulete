@@ -2,14 +2,15 @@ export const full_turn = 360;
 export const max_options = 50;
 export const max_label_length = 80;
 export const spin_duration = 3900;
+export const spin_easing = [0.12, 0.74, 0.11, 1];
 
 export const palette = [
-  { fill: '#ffd078', ink: '#492c14' },
-  { fill: '#eb754f', ink: '#321a13' },
-  { fill: '#c9dc9b', ink: '#233210' },
-  { fill: '#794d9d', ink: '#ffffff' },
-  { fill: '#f2a2ab', ink: '#441c30' },
-  { fill: '#315d49', ink: '#ffffff' },
+  { fill: '#ffca50', ink: '#331d06' },
+  { fill: '#f76e85', ink: '#3c1022' },
+  { fill: '#7842d6', ink: '#ffffff' },
+  { fill: '#58dfc5', ink: '#0c3532' },
+  { fill: '#4d62dc', ink: '#ffffff' },
+  { fill: '#ffa16b', ink: '#3e1c13' },
 ];
 
 export function normalize_angle(angle) {
