@@ -26,9 +26,9 @@ function draw_wheel(canvas, options) {
   context.save();
   context.translate(radius, radius);
 
-  options.forEach((label, index) => {
+  options.forEach(({ label, color_index }, index) => {
     const start = -Math.PI / 2 + index * sector;
-    const { fill, ink } = palette[index % palette.length];
+    const { fill, ink } = palette[color_index];
     context.beginPath();
     context.moveTo(0, 0);
     context.arc(0, 0, radius - 2, start, start + sector);
@@ -67,7 +67,7 @@ export function Wheel({ options, rotation, duration, can_spin, on_spin }) {
 
     // Canvas does not repaint automatically when the bundled font finishes loading.
     if (document.fonts && options.length) {
-      document.fonts.load('700 24px "Geist Variable"', options.join(' '))
+      document.fonts.load('700 24px "Geist Variable"', options.map(({ label }) => label).join(' '))
         .then(() => {
           if (active) draw_wheel(canvas, options);
         })

@@ -2,7 +2,7 @@ import React, { useEffect as use_effect, useRef as use_ref, useState as use_stat
 import { BallMachine, ball_draw_duration, ball_mix_duration } from './ball_machine.jsx';
 import { OptionsEditor } from './options_editor.jsx';
 import { create_roulette_audio, get_tick_times } from './roulette_audio.js';
-import { load_options, save_options } from './storage.js';
+import { append_options, load_options, save_options } from './storage.js';
 import { Wheel } from './wheel.jsx';
 import { get_spin_rotation, palette, spin_duration } from './wheel_math.js';
 
@@ -18,8 +18,9 @@ export function Roulette() {
   const audio_ref = use_ref(null);
   const timer_ref = use_ref(null);
   const draw_balls = mode === 'balls';
-  const winner = winner_index === null ? null : options[winner_index];
-  const winner_color = winner_index === null ? null : palette[winner_index % palette.length];
+  const selected_option = options[winner_index];
+  const winner = selected_option?.label;
+  const winner_color = palette[selected_option?.color_index];
   const can_spin = options.length >= 2 && !is_spinning;
 
   use_effect(() => save_options(options), [options]);
@@ -47,7 +48,7 @@ export function Roulette() {
   }
 
   function import_options(labels, replace) {
-    update_options(replace ? labels : [...options, ...labels]);
+    update_options(append_options(replace ? [] : options, labels));
   }
 
   function remove_option(index) {
@@ -114,7 +115,7 @@ export function Roulette() {
           <button type="button" aria-pressed={draw_balls} disabled={is_spinning} onClick={() => change_mode('balls')}>Sorteo de bolas</button>
         </div>
         {draw_balls
-          ? <BallMachine count={options.length} pending_index={pending_ball} winner_index={winner_index} />
+          ? <BallMachine options={options} pending_index={pending_ball} winner_index={winner_index} />
           : <Wheel options={options} rotation={rotation} duration={duration} can_spin={can_spin} on_spin={run_draw} />}
         <div className="result">
           <span className="screen_reader_status" role="status" aria-atomic="true">

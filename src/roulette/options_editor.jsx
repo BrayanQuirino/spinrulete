@@ -64,9 +64,9 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
       </form>
       {options.length > 0 && (
         <ul className="option_list" aria-label="Opciones en la ruleta">
-          {options.map((label, index) => (
+          {options.map(({ label, color_index }, index) => (
             <li key={index} className="option_row">
-              <span className="option_dot" style={{ background: palette[index % palette.length].fill }} />
+              <span className="option_dot" style={{ background: palette[color_index].fill }} />
               <span className="option_label">{show_numbers && <span className="option_number">{index + 1}. </span>}{label}</span>
               <button
                 className="remove_button"

@@ -6,12 +6,12 @@ export const ball_mix_duration = 2500;
 export const ball_draw_duration = 3400;
 
 /** Pack the balls into a compact rack at rest and stagger their paths in motion. */
-function get_ball_style(index, count) {
+function get_ball_style(index, count, color_index) {
   const columns = Math.min(count, Math.max(4, Math.ceil(Math.sqrt(count * 1.65))));
   const row = Math.floor(index / columns);
   const in_row = Math.min(columns, count - row * columns);
   const gap = Math.min(19, 86 / columns);
-  const { fill, ink } = palette[index % palette.length];
+  const { fill, ink } = palette[color_index];
 
   return {
     '--ball_fill': fill,
@@ -25,7 +25,8 @@ function get_ball_style(index, count) {
   };
 }
 
-export function BallMachine({ count, pending_index, winner_index }) {
+export function BallMachine({ options, pending_index, winner_index }) {
+  const count = options.length;
   const selected_index = pending_index ?? winner_index;
   const is_mixing = pending_index !== null;
   const density = count > 30 ? ' dense' : count > 14 ? ' compact' : '';
@@ -38,11 +39,11 @@ export function BallMachine({ count, pending_index, winner_index }) {
     >
       <div className="ball_glass">
         <div className="ball_rack">
-          {Array.from({ length: count }, (_, index) => (
+          {options.map(({ color_index }, index) => (
             <span
               key={index}
               className={`draw_ball rack_ball${index === selected_index ? ' selected_ball' : ''}`}
-              style={get_ball_style(index, count)}
+              style={get_ball_style(index, count, color_index)}
             >{index + 1}</span>
           ))}
         </div>
@@ -51,7 +52,7 @@ export function BallMachine({ count, pending_index, winner_index }) {
         <div className="ball_chute" />
         <div className="ball_tray">
           {selected_index !== null && (
-            <span className="draw_ball prize_ball" style={get_ball_style(selected_index, count)}>
+            <span className="draw_ball prize_ball" style={get_ball_style(selected_index, count, options[selected_index].color_index)}>
               {selected_index + 1}
             </span>
           )}
