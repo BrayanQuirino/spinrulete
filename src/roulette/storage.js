@@ -1,4 +1,4 @@
-import { max_label_length, max_options, palette } from './wheel_math.js';
+import { max_label_length, max_options } from './wheel_math.js';
 
 const storage_key = 'spinrulete.options.v1';
 const starter_labels = ['Pizza', 'Tacos', 'Sushi', 'Hamburguesas', 'Pasta', 'Ensalada'];
@@ -9,7 +9,7 @@ function assign_colors(options) {
   let next_color = 0;
 
   return options.map(({ label, color_index }) => {
-    if (Number.isInteger(color_index) && color_index >= 0 && color_index < palette.length && !assigned.has(color_index)) {
+    if (Number.isInteger(color_index) && color_index >= 0 && color_index < max_options && !assigned.has(color_index)) {
       assigned.add(color_index);
       return { label, color_index };
     }

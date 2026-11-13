@@ -1,8 +1,8 @@
 import React, { useState as use_state } from 'react';
 import { parse_option_lines } from './option_lines.js';
-import { max_label_length, max_options, palette } from './wheel_math.js';
+import { max_label_length, max_options } from './wheel_math.js';
 
-export function OptionsEditor({ options, is_spinning, on_import, on_remove, show_numbers }) {
+export function OptionsEditor({ options, palette, is_spinning, on_import, on_remove, show_numbers }) {
   const [draft, set_draft] = use_state(null);
   const [feedback, set_feedback] = use_state('');
   const current_list = options.map(({ label }) => label).join('\n');

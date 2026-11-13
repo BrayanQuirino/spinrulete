@@ -4,18 +4,18 @@ export const max_label_length = 80;
 export const spin_duration = 3900;
 export const spin_easing = [0.12, 0.74, 0.11, 1];
 
-export const palette = [
-  { fill: '#f3ca78', ink: '#201809' },
-  { fill: '#f39781', ink: '#2a1511' },
-  { fill: '#b4a4ed', ink: '#191629' },
-  { fill: '#9be5d0', ink: '#10241f' },
-  { fill: '#86b4f0', ink: '#191629' },
-  { fill: '#e7a2c4', ink: '#2e1823' },
-  ...Array.from({ length: max_options - 6 }, (_, index) => {
-    const hue = (index * 137.508) % 360;
-    const lightness = [69, 82, 60, 75, 89][index % 5];
-    return { fill: `hsl(${hue.toFixed(3)}, 72%, ${lightness}%)`, ink: '#17151c' };
-  }),
+function create_palette(hues, saturation, lightness) {
+  return Array.from({ length: max_options }, (_, index) => {
+    const hue = hues[index] ?? ((index - hues.length + 1) * 137.508 + hues[0]) % 360;
+    const tone = lightness[index % lightness.length];
+    return { fill: `hsl(${hue.toFixed(3)}, ${saturation}%, ${tone}%)`, ink: '#17151c' };
+  });
+}
+
+export const palettes = [
+  { name: 'Intensa', colors: create_palette([46, 3, 271, 145, 210, 327], 100, [61, 65, 73, 58, 69, 66]) },
+  { name: 'Pastel', colors: create_palette([42, 12, 256, 162, 214, 327], 72, [78, 83, 87, 81, 85]) },
+  { name: 'Tropical', colors: create_palette([174, 25, 79, 342, 196, 57], 86, [55, 67, 65, 72, 63, 75]) },
 ];
 
 export function normalize_angle(angle) {

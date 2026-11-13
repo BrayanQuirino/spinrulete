@@ -5,7 +5,7 @@ import { OptionsEditor } from './options_editor.jsx';
 import { create_roulette_audio, get_tick_times } from './roulette_audio.js';
 import { load_options, save_options, sync_options } from './storage.js';
 import { Wheel } from './wheel.jsx';
-import { get_spin_rotation, palette, spin_duration } from './wheel_math.js';
+import { get_spin_rotation, palettes, spin_duration } from './wheel_math.js';
 
 export function Roulette() {
   const [options, set_options] = use_state(load_options);
@@ -14,6 +14,8 @@ export function Roulette() {
   const [is_spinning, set_is_spinning] = use_state(false);
   const [winner_index, set_winner_index] = use_state(null);
   const [pending_draw, set_pending_draw] = use_state(null);
+  const [palette_index, set_palette_index] = use_state(0);
+  const palette = palettes[palette_index].colors;
   const [mode, set_mode] = use_state('wheel');
   const [sound_enabled, set_sound_enabled] = use_state(true);
   const audio_ref = use_ref(null);
@@ -118,9 +120,19 @@ export function Roulette() {
           <button type="button" aria-pressed={draw_balls} disabled={is_spinning} onClick={() => change_mode('balls')}>Sorteo de bolas</button>
           <button type="button" aria-pressed={race} disabled={is_spinning} onClick={() => change_mode('race')}>Capibaras</button>
         </div>
-        {draw_wheel && <Wheel options={options} rotation={rotation} duration={duration} can_spin={can_spin} on_spin={run_draw} />}
-        {draw_balls && <BallMachine options={options} pending_index={pending_draw} winner_index={winner_index} />}
-        {race && <CapybaraRace options={options} pending_index={pending_draw} winner_index={winner_index} />}
+        <div className="draw_modes palette_picker" role="group" aria-label="Paleta de colores">
+          {palettes.map(({ name, colors }, index) => (
+            <button key={name} type="button" aria-pressed={palette_index === index} onClick={() => set_palette_index(index)}>
+              <span className="palette_swatches" aria-hidden="true">
+                {colors.slice(0, 3).map(({ fill }) => <span key={fill} style={{ backgroundColor: fill }} />)}
+              </span>
+              {name}
+            </button>
+          ))}
+        </div>
+        {draw_wheel && <Wheel palette={palette} options={options} rotation={rotation} duration={duration} can_spin={can_spin} on_spin={run_draw} />}
+        {draw_balls && <BallMachine palette={palette} options={options} pending_index={pending_draw} winner_index={winner_index} />}
+        {race && <CapybaraRace palette={palette} options={options} pending_index={pending_draw} winner_index={winner_index} />}
         <div className="result">
           <span className="screen_reader_status" role="status" aria-atomic="true">
             {winner ? `Resultado: ${winner}${draw_balls ? `, bola ${winner_index + 1}` : ''}` : ''}
@@ -151,7 +163,7 @@ export function Roulette() {
           </button>
         </div>
       </section>
-      <OptionsEditor show_numbers={draw_balls} options={options} is_spinning={is_spinning} on_import={import_options} on_remove={remove_option} />
+      <OptionsEditor palette={palette} show_numbers={draw_balls} options={options} is_spinning={is_spinning} on_import={import_options} on_remove={remove_option} />
     </div>
   );
 }

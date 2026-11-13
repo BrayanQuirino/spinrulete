@@ -156,6 +156,10 @@ button:disabled { cursor: default; opacity: .52; }
 }
 .draw_modes button[aria-pressed="true"] { background: #2e3c3d; color: #d7fff1; }
 .draw_modes button:disabled { opacity: .72; }
+.wheel_stage > .draw_modes:has(+ .palette_picker) { margin-bottom: 8px; }
+.palette_picker button { display: inline-flex; align-items: center; gap: 7px; }
+.palette_swatches { display: inline-flex; gap: 2px; }
+.palette_swatches span { width: 7px; height: 7px; border-radius: 50%; }
 .result {
   width: min(100%, 560px);
   text-align: center;

@@ -1,5 +1,5 @@
 import React, { useEffect as use_effect, useRef as use_ref } from 'react';
-import { palette, spin_easing } from './wheel_math.js';
+import { spin_easing } from './wheel_math.js';
 
 const canvas_size = 1200;
 const radius = canvas_size / 2;
@@ -16,7 +16,7 @@ function fit_label(context, label, available_width) {
   return characters.join('') + '…';
 }
 
-function draw_wheel(canvas, options) {
+function draw_wheel(canvas, options, palette) {
   const context = canvas.getContext('2d');
   if (!context) return;
 
@@ -60,25 +60,25 @@ function draw_wheel(canvas, options) {
   context.restore();
 }
 
-export function Wheel({ options, rotation, duration, can_spin, on_spin }) {
+export function Wheel({ options, palette, rotation, duration, can_spin, on_spin }) {
   const canvas_ref = use_ref(null);
 
   use_effect(() => {
     const canvas = canvas_ref.current;
     let active = true;
-    draw_wheel(canvas, options);
+    draw_wheel(canvas, options, palette);
 
     // Canvas does not repaint automatically when the bundled font finishes loading.
     if (document.fonts && options.length) {
       document.fonts.load('700 24px "Geist Variable"', options.map(({ label }) => label).join(' '))
         .then(() => {
-          if (active) draw_wheel(canvas, options);
+          if (active) draw_wheel(canvas, options, palette);
         })
         .catch(() => {});
     }
 
     return () => { active = false; };
-  }, [options]);
+  }, [options, palette]);
 
   return (
     <button className="wheel" type="button" aria-label="Girar tocando la rueda" disabled={!can_spin} onClick={on_spin}>

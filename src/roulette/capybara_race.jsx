@@ -1,11 +1,10 @@
 import React from 'react';
-import { palette } from './wheel_math.js';
 import './capybara_race.css';
 
 export const max_racers = 10;
 export const race_duration = 3200;
 
-export function CapybaraRace({ options, pending_index, winner_index }) {
+export function CapybaraRace({ options, palette, pending_index, winner_index }) {
   if (options.length > max_racers) {
     return <p className="race_notice" role="status">La carrera admite hasta 10 opciones. Quita {options.length - max_racers} para correr.</p>;
   }
