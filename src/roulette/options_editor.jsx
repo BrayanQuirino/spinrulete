@@ -11,9 +11,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
   const includes_current_list = options.every(({ label }, index) => pending[index] === label);
   const additions = includes_current_list ? pending.slice(options.length) : pending;
 
-  function submit_options(event) {
-    event.preventDefault();
-    const replace = event.nativeEvent.submitter?.value === 'replace';
+  function submit_options(replace) {
     const labels = replace ? pending : additions;
     const capacity = replace ? max_options : max_options - options.length;
     if (!labels.length || is_spinning) return;
@@ -32,7 +30,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
       return;
     }
 
-    if (!replace || !includes_current_list || additions.length) on_import(labels, replace);
+    on_import(labels, replace);
     set_draft(replace ? '' : null);
     set_feedback(replace ? 'Lista reemplazada.' : 'Opciones agregadas.');
   }
@@ -43,7 +41,10 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
         <h2 id="options_heading">Tus opciones</h2>
         <span className="option_count" aria-label={`${options.length} de ${max_options} opciones`}>{options.length}/{max_options}</span>
       </div>
-      <form className="option_form" onSubmit={submit_options}>
+      <form className="option_form" onSubmit={(event) => {
+        event.preventDefault();
+        submit_options(false);
+      }}>
         <label htmlFor="option_label">Escribe o pega una lista</label>
         <p className="editor_note" id="list_hint">Una opción por línea. Las líneas vacías se omiten.</p>
         <textarea
@@ -55,13 +56,14 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
           }}
           aria-describedby="list_hint"
           rows={8}
+          placeholder={'Pizza\nTacos\nSushi'}
           readOnly={is_spinning}
         />
         <div className="list_actions">
-          <button className="add_button" type="submit" value="append" disabled={!additions.length || is_spinning}>
+          <button className="add_button" type="submit" disabled={!additions.length || is_spinning}>
             {additions.length ? `Agregar ${additions.length}` : 'Agregar'}
           </button>
-          <button className="replace_button" type="submit" value="replace" disabled={!pending.length || is_spinning}>
+          <button className="replace_button" type="button" onClick={() => submit_options(true)} disabled={!pending.length || is_spinning}>
             Reemplazar lista
           </button>
         </div>
