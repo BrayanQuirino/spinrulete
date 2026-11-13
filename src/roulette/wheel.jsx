@@ -4,6 +4,7 @@ import { palette, spin_easing } from './wheel_math.js';
 const canvas_size = 1200;
 const radius = canvas_size / 2;
 const circle = 2 * Math.PI;
+const max_visible_labels = 80;
 
 function fit_label(context, label, available_width) {
   if (context.measureText(label).width <= available_width) return label;
@@ -23,6 +24,7 @@ function draw_wheel(canvas, options) {
   if (!options.length) return;
 
   const sector = circle / options.length;
+  const show_labels = options.length <= max_visible_labels;
   context.save();
   context.translate(radius, radius);
 
@@ -35,10 +37,11 @@ function draw_wheel(canvas, options) {
     context.closePath();
     context.fillStyle = fill;
     context.fill();
-    context.lineWidth = 3;
+    context.lineWidth = Math.min(3, radius * sector / 5);
     context.strokeStyle = '#14191e40';
     context.stroke();
 
+    if (!show_labels) return;
     context.save();
     const label_angle = start + sector / 2;
     const flip_label = Math.cos(label_angle) < 0;
@@ -66,7 +69,7 @@ export function Wheel({ options, rotation, duration, can_spin, on_spin }) {
     draw_wheel(canvas, options);
 
     // Canvas does not repaint automatically when the bundled font finishes loading.
-    if (document.fonts && options.length) {
+    if (document.fonts && options.length && options.length <= max_visible_labels) {
       document.fonts.load('700 24px "Geist Variable"', options.map(({ label }) => label).join(' '))
         .then(() => {
           if (active) draw_wheel(canvas, options);

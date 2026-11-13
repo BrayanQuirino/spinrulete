@@ -44,6 +44,7 @@
   top: var(--ball_y);
   transform: translate(-50%, -50%);
 }
+.crowded .rack_ball { width: var(--rack_ball_size); box-shadow: none; }
 .rack_ball.selected_ball { visibility: hidden; }
 .is_mixing .rack_ball {
   animation: mix_ball var(--mix_time) linear both;

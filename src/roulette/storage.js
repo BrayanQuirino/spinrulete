@@ -3,30 +3,37 @@ import { max_label_length, max_options, palette } from './wheel_math.js';
 const storage_key = 'spinrulete.options.v1';
 const starter_labels = ['Pizza', 'Tacos', 'Sushi', 'Hamburguesas', 'Pasta', 'Ensalada'];
 
+function assign_colors(options) {
+  const reserved = new Set(options.map(({ color_index }) => color_index));
+  const assigned = new Set();
+  let next_color = 0;
+
+  return options.map(({ label, color_index }) => {
+    if (Number.isInteger(color_index) && color_index >= 0 && color_index < palette.length && !assigned.has(color_index)) {
+      assigned.add(color_index);
+      return { label, color_index };
+    }
+
+    while (reserved.has(next_color)) next_color += 1;
+    return { label, color_index: next_color++ };
+  });
+}
+
 export function append_options(options, labels) {
-  const last_color = options.at(-1)?.color_index ?? -1;
-  return [...options, ...labels.map((label, index) => ({
-    label,
-    color_index: (last_color + 1 + index) % palette.length,
-  }))];
+  return assign_colors([...options, ...labels.map((label) => ({ label }))]);
 }
 
 export function load_options() {
   try {
     const saved = JSON.parse(window.localStorage.getItem(storage_key));
     if (Array.isArray(saved)) {
-      // Migrate older string lists using the same colors they displayed before.
+      // Keep the first use of each saved color and give duplicates a free color.
       const options = saved
         .map((entry) => typeof entry === 'string' ? { label: entry } : entry)
         .filter((entry) => typeof entry?.label === 'string' && entry.label.trim())
         .slice(0, max_options)
-        .map(({ label, color_index }, index) => ({
-          label: label.trim().slice(0, max_label_length),
-          color_index: Number.isInteger(color_index) && color_index >= 0 && color_index < palette.length
-            ? color_index
-            : index % palette.length,
-        }));
-      if (options.length) return options;
+        .map(({ label, color_index }) => ({ label: label.trim().slice(0, max_label_length), color_index }));
+      if (options.length) return assign_colors(options);
     }
   } catch {
     // Storage can be unavailable or contain data from a previous session.

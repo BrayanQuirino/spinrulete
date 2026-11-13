@@ -1,5 +1,5 @@
 export const full_turn = 360;
-export const max_options = 50;
+export const max_options = 1000;
 export const max_label_length = 80;
 export const spin_duration = 3900;
 export const spin_easing = [0.12, 0.74, 0.11, 1];
@@ -11,6 +11,11 @@ export const palette = [
   { fill: '#9be5d0', ink: '#10241f' },
   { fill: '#86b4f0', ink: '#191629' },
   { fill: '#e7a2c4', ink: '#2e1823' },
+  ...Array.from({ length: max_options - 6 }, (_, index) => {
+    const hue = (index * 137.508) % 360;
+    const lightness = [69, 82, 60, 75, 89][index % 5];
+    return { fill: `hsl(${hue.toFixed(3)}, 72%, ${lightness}%)`, ink: '#17151c' };
+  }),
 ];
 
 export function normalize_angle(angle) {
