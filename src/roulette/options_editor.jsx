@@ -33,7 +33,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
     }
 
     if (!replace || !includes_current_list || additions.length) on_import(labels, replace);
-    set_draft(null);
+    set_draft(replace ? '' : null);
     set_feedback(replace ? 'Lista reemplazada.' : 'Opciones agregadas.');
   }
 
@@ -55,7 +55,6 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
           }}
           aria-describedby="list_hint"
           rows={8}
-          placeholder={'Pizza\nTacos\nSushi'}
           readOnly={is_spinning}
         />
         <div className="list_actions">
