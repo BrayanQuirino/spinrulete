@@ -3,31 +3,37 @@ import { parse_option_lines } from './option_lines.js';
 import { max_label_length, max_options, palette } from './wheel_math.js';
 
 export function OptionsEditor({ options, is_spinning, on_import, on_remove, show_numbers }) {
-  const [draft, set_draft] = use_state('');
+  const [draft, set_draft] = use_state(null);
   const [feedback, set_feedback] = use_state('');
-  const pending = parse_option_lines(draft);
-  const long_line = pending.findIndex((label) => label.length > max_label_length);
+  const current_list = options.map(({ label }) => label).join('\n');
+  const editor_text = draft ?? current_list;
+  const pending = parse_option_lines(editor_text);
+  const includes_current_list = options.every(({ label }, index) => pending[index] === label);
+  const additions = includes_current_list ? pending.slice(options.length) : pending;
 
   function submit_options(event) {
     event.preventDefault();
     const replace = event.nativeEvent.submitter?.value === 'replace';
+    const labels = replace ? pending : additions;
     const capacity = replace ? max_options : max_options - options.length;
-    if (!pending.length || is_spinning) return;
+    if (!labels.length || is_spinning) return;
+
+    const long_line = labels.findIndex((label) => label.length > max_label_length);
 
     if (long_line >= 0) {
       set_feedback(`La opción ${long_line + 1} supera los ${max_label_length} caracteres.`);
       return;
     }
 
-    if (pending.length > capacity) {
+    if (labels.length > capacity) {
       set_feedback(capacity > 0
         ? `Caben ${capacity} opciones más con esta acción. Revisa la lista antes de continuar.`
         : 'La ruleta está llena. Quita opciones o usa «Reemplazar lista».');
       return;
     }
 
-    on_import(pending, replace);
-    set_draft('');
+    if (!replace || !includes_current_list || additions.length) on_import(labels, replace);
+    set_draft(null);
     set_feedback(replace ? 'Lista reemplazada.' : 'Opciones agregadas.');
   }
 
@@ -42,7 +48,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
         <p className="editor_note" id="list_hint">Una opción por línea. Las líneas vacías se omiten.</p>
         <textarea
           id="option_label"
-          value={draft}
+          value={editor_text}
           onChange={(event) => {
             set_draft(event.target.value);
             set_feedback('');
@@ -53,10 +59,10 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
           readOnly={is_spinning}
         />
         <div className="list_actions">
-          <button className="add_button" type="submit" value="append" disabled={!pending.length || is_spinning}>
-            {pending.length ? `Agregar ${pending.length}` : 'Agregar'}
+          <button className="add_button" type="submit" value="append" disabled={!additions.length || is_spinning}>
+            {additions.length ? `Agregar ${additions.length}` : 'Agregar'}
           </button>
-          <button className="replace_button" type="submit" value="replace" disabled={!pending.length || !options.length || is_spinning}>
+          <button className="replace_button" type="submit" value="replace" disabled={!pending.length || is_spinning}>
             Reemplazar lista
           </button>
         </div>
