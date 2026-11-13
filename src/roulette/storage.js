@@ -16,7 +16,7 @@ export function load_options() {
     const saved = JSON.parse(window.localStorage.getItem(storage_key));
     if (Array.isArray(saved)) {
       // Migrate older string lists using the same colors they displayed before.
-      return saved
+      const options = saved
         .map((entry) => typeof entry === 'string' ? { label: entry } : entry)
         .filter((entry) => typeof entry?.label === 'string' && entry.label.trim())
         .slice(0, max_options)
@@ -26,6 +26,7 @@ export function load_options() {
             ? color_index
             : index % palette.length,
         }));
+      if (options.length) return options;
     }
   } catch {
     // Storage can be unavailable or contain data from a previous session.
