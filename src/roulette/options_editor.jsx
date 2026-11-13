@@ -11,9 +11,9 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
   const includes_current_list = options.every(({ label }, index) => pending[index] === label);
   const additions = includes_current_list ? pending.slice(options.length) : pending;
 
-  function submit_options(replace) {
-    const labels = replace ? pending : additions;
-    const capacity = replace ? max_options : max_options - options.length;
+  function submit_options() {
+    const labels = additions;
+    const capacity = max_options - options.length;
     if (!labels.length || is_spinning) return;
 
     const long_line = labels.findIndex((label) => label.length > max_label_length);
@@ -30,9 +30,15 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
       return;
     }
 
-    on_import(labels, replace);
-    set_draft(replace ? '' : null);
-    set_feedback(replace ? 'Lista reemplazada.' : 'Opciones agregadas.');
+    on_import(labels, false);
+    set_draft(null);
+    set_feedback('Opciones agregadas.');
+  }
+
+  function clear_list() {
+    on_import([], true);
+    set_draft('');
+    set_feedback('Lista vacía. Escribe o pega opciones y pulsa Agregar.');
   }
 
   return (
@@ -43,7 +49,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
       </div>
       <form className="option_form" onSubmit={(event) => {
         event.preventDefault();
-        submit_options(false);
+        submit_options();
       }}>
         <label htmlFor="option_label">Escribe o pega una lista</label>
         <p className="editor_note" id="list_hint">Una opción por línea. Las líneas vacías se omiten.</p>
@@ -63,7 +69,7 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
           <button className="add_button" type="submit" disabled={!additions.length || is_spinning}>
             {additions.length ? `Agregar ${additions.length}` : 'Agregar'}
           </button>
-          <button className="replace_button" type="button" onClick={() => submit_options(true)} disabled={!pending.length || is_spinning}>
+          <button className="replace_button" type="button" onClick={clear_list} disabled={is_spinning || (!options.length && !editor_text)}>
             Reemplazar lista
           </button>
         </div>
