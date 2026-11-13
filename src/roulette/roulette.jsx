@@ -3,7 +3,7 @@ import { BallMachine, ball_draw_duration, ball_mix_duration } from './ball_machi
 import { CapybaraRace, max_racers, race_duration } from './capybara_race.jsx';
 import { OptionsEditor } from './options_editor.jsx';
 import { create_roulette_audio, get_tick_times } from './roulette_audio.js';
-import { append_options, load_options, save_options } from './storage.js';
+import { load_options, save_options, sync_options } from './storage.js';
 import { Wheel } from './wheel.jsx';
 import { get_spin_rotation, palette, spin_duration } from './wheel_math.js';
 
@@ -50,8 +50,8 @@ export function Roulette() {
     set_mode(next_mode);
   }
 
-  function import_options(labels, replace) {
-    update_options(append_options(replace ? [] : options, labels));
+  function import_options(labels) {
+    update_options(sync_options(options, labels));
   }
 
   function remove_option(index) {

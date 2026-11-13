@@ -4,7 +4,7 @@ import { palette, spin_easing } from './wheel_math.js';
 const canvas_size = 1200;
 const radius = canvas_size / 2;
 const circle = 2 * Math.PI;
-const max_visible_labels = 80;
+const label_radius = radius - 24;
 
 function fit_label(context, label, available_width) {
   if (context.measureText(label).width <= available_width) return label;
@@ -24,7 +24,8 @@ function draw_wheel(canvas, options) {
   if (!options.length) return;
 
   const sector = circle / options.length;
-  const show_labels = options.length <= max_visible_labels;
+  const font_size = Math.min(49, (label_radius - 150) * sector * 0.78);
+  const label_width = Math.min(355, Math.max(150, label_radius - font_size / sector / 0.78));
   context.save();
   context.translate(radius, radius);
 
@@ -41,19 +42,18 @@ function draw_wheel(canvas, options) {
     context.strokeStyle = '#14191e40';
     context.stroke();
 
-    if (!show_labels) return;
     context.save();
     const label_angle = start + sector / 2;
     const flip_label = Math.cos(label_angle) < 0;
     // Keep the labels on the left half readable in the resting orientation.
     context.rotate(label_angle);
-    context.translate(radius - 49, 0);
+    context.translate(label_radius, 0);
     if (flip_label) context.rotate(Math.PI);
-    context.font = `700 ${Math.min(49, Math.max(24, 820 / options.length))}px "Geist Variable", system-ui, sans-serif`;
+    context.font = `700 ${font_size}px "Geist Variable", system-ui, sans-serif`;
     context.fillStyle = ink;
     context.textBaseline = 'middle';
     context.textAlign = flip_label ? 'left' : 'right';
-    context.fillText(fit_label(context, label, 355), 0, 0);
+    context.fillText(fit_label(context, label, label_width), 0, 0);
     context.restore();
   });
 
@@ -69,7 +69,7 @@ export function Wheel({ options, rotation, duration, can_spin, on_spin }) {
     draw_wheel(canvas, options);
 
     // Canvas does not repaint automatically when the bundled font finishes loading.
-    if (document.fonts && options.length && options.length <= max_visible_labels) {
+    if (document.fonts && options.length) {
       document.fonts.load('700 24px "Geist Variable"', options.map(({ label }) => label).join(' '))
         .then(() => {
           if (active) draw_wheel(canvas, options);

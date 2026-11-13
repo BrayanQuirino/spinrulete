@@ -8,35 +8,30 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
   const current_list = options.map(({ label }) => label).join('\n');
   const editor_text = draft ?? current_list;
   const pending = parse_option_lines(editor_text);
-  const includes_current_list = options.every(({ label }, index) => pending[index] === label);
-  const additions = includes_current_list ? pending.slice(options.length) : pending;
+  const changed = pending.length !== options.length || pending.some((label, index) => label !== options[index].label);
 
   function submit_options() {
-    const labels = additions;
-    const capacity = max_options - options.length;
-    if (!labels.length || is_spinning) return;
+    if (!changed || is_spinning) return;
 
-    const long_line = labels.findIndex((label) => label.length > max_label_length);
+    const long_line = pending.findIndex((label) => label.length > max_label_length);
 
     if (long_line >= 0) {
       set_feedback(`La opción ${long_line + 1} supera los ${max_label_length} caracteres.`);
       return;
     }
 
-    if (labels.length > capacity) {
-      set_feedback(capacity > 0
-        ? `Caben ${capacity} opciones más con esta acción. Revisa la lista antes de continuar.`
-        : 'La ruleta está llena. Quita opciones o usa «Reemplazar lista».');
+    if (pending.length > max_options) {
+      set_feedback(`La lista admite hasta ${max_options} opciones.`);
       return;
     }
 
-    on_import(labels, false);
+    on_import(pending);
     set_draft(null);
-    set_feedback('Opciones agregadas.');
+    set_feedback('Lista actualizada.');
   }
 
   function clear_list() {
-    on_import([], true);
+    on_import([]);
     set_draft('');
     set_feedback('Lista vacía. Escribe o pega opciones y pulsa Agregar.');
   }
@@ -66,8 +61,8 @@ export function OptionsEditor({ options, is_spinning, on_import, on_remove, show
           readOnly={is_spinning}
         />
         <div className="list_actions">
-          <button className="add_button" type="submit" disabled={!additions.length || is_spinning}>
-            {additions.length ? `Agregar ${additions.length}` : 'Agregar'}
+          <button className="add_button" type="submit" disabled={!changed || is_spinning}>
+            Agregar
           </button>
           <button className="replace_button" type="button" onClick={clear_list} disabled={is_spinning || (!options.length && !editor_text)}>
             Reemplazar lista

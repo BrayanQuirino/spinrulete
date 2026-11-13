@@ -23,6 +23,19 @@ export function append_options(options, labels) {
   return assign_colors([...options, ...labels.map((label) => ({ label }))]);
 }
 
+export function sync_options(options, labels) {
+  const colors_by_label = new Map();
+  for (const { label, color_index } of options) {
+    if (!colors_by_label.has(label)) colors_by_label.set(label, []);
+    colors_by_label.get(label).push(color_index);
+  }
+
+  return assign_colors(labels.map((label) => ({
+    label,
+    color_index: colors_by_label.get(label)?.shift(),
+  })));
+}
+
 export function load_options() {
   try {
     const saved = JSON.parse(window.localStorage.getItem(storage_key));
